@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+  <head> 
+    <style type=text/css>
+      html,body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        justify-content: center;
+        background-color: rgba(231, 226, 226, 0.616);
+      }
+      .todoapp {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+      }
+      h1 {
+        display: flex;
+        justify-content: center;
+        font-size: 100px;
+        margin: 0px;
+        color: rgba(206, 47, 47, 0.322);
+      }
+      .header {
+        display: flex;
+        flex: none;
+      }
+      .main {
+        display: flex;
+        flex-direction: column;
+        flex: none;
+        background-color: rgba(175, 172, 172, 0.616);
+      }
+      .footer {
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        background-color: rgba(175, 172, 172, 0.616);
+      }
+      .filters {
+        display: flex;
+        justify-content: space-around;
+        flex: 1;
+        font-size: 10px;
+        list-style: none;
+      }
+      input {
+        display: block;/*属性应为blocks，否则表单无法竖直排列*/
+      }
+      input[type="text"] {
+        width: 400px;
+        height: 40px;
+        flex: none;
+      }
+      input[type="checkbox"] {
+        outline: none;
+        flex:1;
+      }
+      div {
+        display: flex;
+      }
+      .completed,.active {
+        flex-direction: column;
+      }
+    </style>
+    <script type="text/javascript"> 
+      function ToDo(value) {
+        this.value = value;
+        this.state = false;//默认未完成
+      }
+
+      var todos = [];
+
+      function store(nToDo) {
+        var todo = new ToDo(nToDo.value);
+        todos.push(todo);
+      }
+
+      function addInput(nToDo) {
+        var formWrap = document.getElementsByClassName('list')[0];
+        var oToDo = document.createElement('input');
+        var check_oToDo = document.createElement('input');
+        var divWrap = document.createElement('div');
+        
+        oToDo.type = "text";
+        check_oToDo.type = "checkbox";
+        
+        oToDo.className = 'old-todo';
+        check_oToDo.className = 'check-todo';
+
+        oToDo.addEventListener('keydown', changePress, false);
+        check_oToDo.addEventListener('click', changeClick, false);
+
+        divWrap.appendChild(check_oToDo);
+        divWrap.appendChild(oToDo);
+        formWrap.appendChild(divWrap);
+      }
+      function show(nToDo) {
+          var todo = document.getElementsByClassName('old-todo');
+          todo[todo.length-1].value = nToDo.value;
+          nToDo.value = '';
+      }
+
+      function enterPress(e) {
+        var nToDo = document.getElementsByClassName('new-todo')[0];
+        if (e.keyCode == 13 && nToDo.value != '') {
+          store(nToDo);
+          addInput(nToDo);
+          show(nToDo);
+          countItems();
+        }
+      }
+      function changePress(e) {
+        var todo = document.activeElement;
+        var nInput = document.getElementsByClassName('new-todo')[0];
+        var parent = todo.parentElement;
+        if (e.keyCode == 13 && todo.value != '') {
+          nInput.focus();
+        } else if ((e.keyCode == 13 && todo.value == '') || (e.keyCode == 8 && todo.value == '')) {
+          parent.parentNode.removeChild(parent);
+          nInput.focus();
+        }
+      }
+      function changeClick() {
+        countItems();
+      }
+      function countItems() {
+        var checkList = document.getElementsByClassName("check-todo");
+        var len = checkList.length;
+        var count = 0;
+        for (let i =0; i < len; i++) {
+          if(checkList[i].checked == false){
+            count++;
+          }
+          todos[i].state = checkList[i].checked;
+        }
+        return changeP(count);
+      }
+      function changeP(count) {
+        var p = document.getElementsByClassName('count')[0];
+        if (count == 0){
+          p.innerHTML = '0 item left';
+        }else {
+          p.innerHTML = count + ' items left';
+        }
+      }
+
+      function deleteAll(){
+        var checkList = document.getElementsByClassName("check-todo");
+        var len = checkList.length;
+        for (let i = 0; i < n;i++) {
+          if(a[i].checked){
+            let a_parent = a[i].parentNode;
+            a_parent.parentNode.removeChild(a_parent);
+
+            todos.splice(i,1);
+
+            n--;  //a的长度随着removeChild操作而逐渐减少，数组中各元素在数组中的位置也会随着变化。
+            i--;
+          }
+        }
+        countItems();
+      }
+      function selectAll(){
+        var a = document.getElementsByName("todo");
+        var n = a.length;
+        for(let i =0;i < n;i++) {
+          a[i].checked = true;
+          todos[i].state = true;
+        }
+      }
+    </script> 
+  </head> 
+
+  <body>
+    <section class="todoapp">
+      <header>
+        <h1>todos</h1>
+        <div class="header">
+          <input type="button" class="toggle-all" onclick="selectAll()" value="全选">
+          <input type="text" class="new-todo" onkeypress="enterPress(event)" />
+        </div>
+      </header> 
+
+      <section class="main"> 
+        <form class="list">
+
+        </form>  
+      </section>
+      <footer class="footer">
+        <ul class="filters">
+          <li>
+            <a class="count">0 item left</a>
+          </li>
+          <li>
+            <a href="#all">All</a>
+          </li>
+          <li>
+            <a href="#active">Active</a>
+          </li>
+          <li>
+            <a href="#completed">Completed</a>
+          </li>
+          <li>
+            <input type="button" name="delete" onclick="deleteAll()" value="Clear completed">
+          </li>
+        </ul>
+      </footer>
+      <button onclick="finished()">已完成</button>  
+      <div class='completed'></div>
+      <button onclick='unfinished()'>未完成</button>
+      <div class='active'></div>
+    </section>
+
+  </body> 
+                
+
+</html>
+
